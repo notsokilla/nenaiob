@@ -3,30 +3,35 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, RedirectResponse
 import hashlib
 import hmac
-import sqlite3
 import os
+from sqlalchemy import create_engine, Column, Integer, String, Float
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
 app = FastAPI()
 
-# Подключение к SQLite
-conn = sqlite3.connect(":memory:", check_same_thread=False)
-cursor = conn.cursor()
+# Подключение к PostgreSQL
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://users_nenaiob_user:4oYI56V3u9npNiNGNFko5PjJvN3YVGRa@dpg-d49s7kruibrs73c2idt0-a.frankfurt-postgres.render.com/users_nenaiob")
+
+engine = create_engine(DATABASE_URL)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+Base = declarative_base()
+
+# Модель пользователя
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    telegram_id = Column(String, unique=True, index=True)
+    username = Column(String)
+    balance = Column(Float, default=100.0)
+    email = Column(String, default="")
 
 # Создание таблиц
-cursor.execute("""
-    CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        telegram_id TEXT UNIQUE,
-        username TEXT,
-        balance REAL DEFAULT 100.0,
-        email TEXT DEFAULT '',
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-""")
-conn.commit()
+Base.metadata.create_all(bind=engine)
 
 # Telegram Bot Token (замените на свой)
-TELEGRAM_BOT_TOKEN = "8501831434:AAE1Mbfjc97nZD0Y4IshYqdgXdlvUn7_J2o"
+TELEGRAM_BOT_TOKEN = os.getenv("8501831434:AAE1Mbfjc97nZD0Y4IshYqdgXdlvUn7_J2o")
 
 def check_telegram_login_auth(data):
     received_hash = data.pop('hash', None)
@@ -52,44 +57,44 @@ def auth_telegram_login(request: Request):
     username = form_data.get('first_name', 'Unknown')
     email = form_data.get('email', '')
 
-    cursor.execute("SELECT id, balance FROM users WHERE telegram_id = ?", (telegram_id,))
-    user = cursor.fetchone()
+    db = SessionLocal()
+    user = db.query(User).filter(User.telegram_id == telegram_id).first()
     if user:
-        user_id = user[0]
-        balance = user[1]
+        user_id = user.id
+        balance = user.balance
     else:
-        cursor.execute(
-            "INSERT INTO users (telegram_id, username, email) VALUES (?, ?, ?)",
-            (telegram_id, username, email)
-        )
-        conn.commit()
-        user_id = cursor.lastrowid
-        balance = 100.0
+        new_user = User(telegram_id=telegram_id, username=username, email=email)
+        db.add(new_user)
+        db.commit()
+        user_id = new_user.id
+        balance = new_user.balance
 
-    # Редиректим сразу на home.html с user_id
+    db.close()
+
     redirect_url = f"/home.html?user_id={user_id}"
     return RedirectResponse(url=redirect_url, status_code=302)
 
 @app.get("/api/balance/{user_id}")
 def get_balance(user_id: int):
-    cursor.execute("SELECT balance FROM users WHERE id = ?", (user_id,))
-    user = cursor.fetchone()
+    db = SessionLocal()
+    user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-    return {"balance": user[0]}
+    db.close()
+    return {"balance": user.balance}
 
 @app.get("/api/profile/{user_id}")
 def get_profile(user_id: int):
-    cursor.execute("SELECT id, username, balance, email, created_at FROM users WHERE id = ?", (user_id,))
-    user = cursor.fetchone()
+    db = SessionLocal()
+    user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
+    db.close()
     return {
-        "id": user[0],
-        "username": user[1],
-        "balance": user[2],
-        "email": user[3],
-        "created_at": user[4]
+        "id": user.id,
+        "username": user.username,
+        "balance": user.balance,
+        "email": user.email,
     }
 
 # Подключаем статику
@@ -99,5 +104,5 @@ app.mount("/", StaticFiles(directory="static", html=True), name="static")
 # Запуск сервера (только если файл запускается напрямую)
 if __name__ == "__main__":
     import uvicorn
-    port = int(os.environ.get("PORT", 10000))  # Render использует PORT=10000 по умолчанию
+    port = int(os.environ.get("PORT", 10000))
     uvicorn.run(app, host="0.0.0.0", port=port)
