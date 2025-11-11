@@ -94,3 +94,9 @@ def get_profile(user_id: int):
 # Подключаем статику
 app.mount("/static", StaticFiles(directory="static"), name="static")
 app.mount("/", StaticFiles(directory="static", html=True), name="static")
+
+# Запуск сервера (только если файл запускается напрямую)
+if __name__ == "__main__":
+    import uvicorn
+    port = int(os.environ.get("PORT", 10000))  # Render использует PORT=10000 по умолчанию
+    uvicorn.run(app, host="0.0.0.0", port=port)
