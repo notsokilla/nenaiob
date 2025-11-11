@@ -41,7 +41,7 @@ def check_telegram_login_auth(data):
 
     return hmac.compare_digest(calculated_hash, received_hash)
 
-# Авторизация через Telegram (теперь GET)
+# Авторизация через Telegram
 @app.get("/api/auth/telegram-login")
 def auth_telegram_login(request: Request):
     form_data = dict(request.query_params)
@@ -66,6 +66,7 @@ def auth_telegram_login(request: Request):
         user_id = cursor.lastrowid
         balance = 100.0
 
+    # Редиректим сразу на home.html с user_id
     redirect_url = f"/home.html?user_id={user_id}"
     return RedirectResponse(url=redirect_url, status_code=302)
 
