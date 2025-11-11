@@ -4,3 +4,5 @@ authlib
 requests
 authlib[httpx]
 httpx
+psycopg2-binary
+sqlalchemy
