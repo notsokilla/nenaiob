@@ -11,7 +11,7 @@ from sqlalchemy.orm import sessionmaker
 app = FastAPI()
 
 # Подключение к PostgreSQL
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://users_nenaiob_user:4oYI56V3u9npNiNGNFko5PjJvN3YVGRa@dpg-d49s7kruibrs73c2idt0-a.frankfurt-postgres.render.com/users_nenaiob")
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://user:password@host:5432/dbname")
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -31,7 +31,9 @@ class User(Base):
 Base.metadata.create_all(bind=engine)
 
 # Telegram Bot Token (замените на свой)
-TELEGRAM_BOT_TOKEN = os.getenv("8501831434:AAE1Mbfjc97nZD0Y4IshYqdgXdlvUn7_J2o")
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+if TELEGRAM_BOT_TOKEN is None:
+    raise ValueError("TELEGRAM_BOT_TOKEN не установлен")
 
 def check_telegram_login_auth(data):
     received_hash = data.pop('hash', None)
