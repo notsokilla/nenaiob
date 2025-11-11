@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Вход в Казино-Ненайоб</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #0f0f13;
+            color: #fff;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .login-box {
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 32px;
+            background: #1a1a2e;
+            border-radius: 12px;
+            text-align: center;
+        }
+        .btn-vk {
+            background: #4a75f5;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin: 8px 0;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+
+    <div class="login-box">
+        <h2 class="text-2xl font-bold mb-4">Авторизация</h2>
+
+        <!-- VK -->
+        <div class="btn-vk" onclick="window.location.href='/login/vk'">
+            <img src="https://via.placeholder.com/24/4a75f5/fff?text=V" style="width:24px; height:24px; vertical-align:middle; margin-right:8px;"> VK
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Казино-Ненайоб</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #0f0f13;
+            color: #fff;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .hero {
+            background: url('https://via.placeholder.com/1920x1080/000/fff?text=CSGORUN+STYLE') no-repeat center;
+            background-size: cover;
+            padding: 64px 32px;
+            text-align: center;
+        }
+        .btn-primary {
+            background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            margin: 8px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+        .btn-secondary {
+            background: #1a1a2e;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            margin: 8px;
+            cursor: pointer;
+        }
+        .game-card {
+            background: linear-gradient(135deg, #0c0c1a, #1a1a2e);
+            border-radius: 12px;
+            padding: 16px;
+            transition: transform 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        .game-card:hover {
+            transform: translateY(-4px);
+        }
+        .badge {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: #ff6b6b;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .price-tag {
+            position: absolute;
+            bottom: 8px;
+            left: 8px;
+            background: rgba(0,0,0,0.5);
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .footer {
+            background: #1a1a2e;
+            padding: 24px;
+            border-top: 1px solid #2d2d3f;
+        }
+        .social-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #4a4a6a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+
+    <!-- Шапка -->
+    <header class="p-4 flex justify-between items-center border-b border-gray-700">
+        <div class="flex gap-2">
+            <div class="social-icon">VK</div>
+            <div class="social-icon">Discord</div>
+            <div class="social-icon">Telegram</div>
+            <div class="social-icon">YouTube</div>
+            <div class="social-icon">Instagram</div>
+            <div class="social-icon">X</div>
+        </div>
+
+        <div class="flex items-center gap-4">
+            <button class="bg-gray-800 px-3 py-1 rounded-full text-sm">RU</button>
+        </div>
+    </header>
+
+    <!-- Геро-баннер -->
+    <section class="hero">
+        <h1 class="text-4xl font-bold mb-4">Казино-Ненайоб</h1>
+        <h2 class="text-2xl mb-4">Входи и наслаждайся!</h2>
+        <p class="mb-6">Войди через Telegram или VK и получи +15% бонуса прямо сейчас.<br>
+        Тебя ждет атмосфера незабываемых эмоций, любовь к играм и крутая компания единомышленников</p>
+        <div class="flex justify-center gap-4">
+            <button class="btn-secondary" onclick="window.location.href='/login.html'">Войти на сайт</button>
+        </div>
+    </section>
+
+    <!-- Что внутри -->
+    <section class="p-4">
+        <h3 class="text-xl font-bold mb-4">🎮 Что внутри</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="game-card">
+                <div class="text-xs mb-1">88</div>
+                <h4 class="text-xl font-bold">Бегущий человек</h4>
+                <img src="https://via.placeholder.com/300/000/fff?text=БЕГУЩИЙ+ЧЕЛОВЕК" class="w-full h-32 object-cover mt-2 rounded">
+            </div>
+            <div class="game-card">
+                <div class="text-xs mb-1">124</div>
+                <h4 class="text-xl font-bold">Плитки</h4>
+                <img src="https://via.placeholder.com/300/000/fff?text=ПЛИТКИ" class="w-full h-32 object-cover mt-2 rounded">
+            </div>
+            <div class="game-card">
+                <h4 class="text-xl font-bold">Лиги</h4>
+                <img src="https://via.placeholder.com/300/000/fff?text=ЛИГИ" class="w-full h-32 object-cover mt-2 rounded">
+            </div>
+        </div>
+    </section>
+
+    <!-- Футер -->
+    <footer class="footer">
+        <div class="flex justify-between items-center">
+            <div>
+                <h4 class="text-xl font-bold">Казино-Ненайоб</h4>
+                <p class="text-xs mt-2">© 2025 LATECHNOLOGY LTD</p>
+            </div>
+            <div class="flex gap-4">
+                <div class="social-icon">VK</div>
+                <div class="social-icon">Discord</div>
+                <div class="social-icon">Telegram</div>
+                <div class="social-icon">YouTube</div>
+                <button class="bg-gray-800 px-3 py-1 rounded-full text-sm">Помощь</button>
+                <button class="bg-gray-800 px-3 py-1 rounded-full text-sm">RU</button>
+            </div>
+        </div>
+        <div class="mt-4 text-xs text-gray-500">
+            <a href="#">Пользовательское соглашение</a> ·
+            <a href="#">Responsible Gaming Policy</a> ·
+            <a href="#">Fair play</a> ·
+            <a href="#">Блог</a>
+        </div>
+    </footer>
+
+</body>
+</html>

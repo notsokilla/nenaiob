@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Казино-Ненайоб</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #0f0f13;
+            color: #fff;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .nav-item {
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .nav-item:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        .active {
+            background: #1a1a2e;
+        }
+        .balance-box {
+            background: #1a1a2e;
+            padding: 6px 12px;
+            border-radius: 8px;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        .profile-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #4a4a6a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+
+    <!-- Шапка -->
+    <header class="p-4 flex justify-between items-center border-b border-gray-700">
+        <div class="flex items-center gap-4">
+            <h1 class="text-xl font-bold">Казино-Ненайоб</h1>
+        </div>
+
+        <div class="flex items-center gap-4">
+            <div class="balance-box">
+                Баланс: <span id="balance">Загрузка...</span>
+            </div>
+            <div class="profile-icon" onclick="openProfile()">
+                👤
+            </div>
+        </div>
+    </header>
+
+    <!-- Навигация -->
+    <nav class="p-4 bg-gray-800">
+        <div class="flex space-x-4">
+            <div class="nav-item active" onclick="loadPage('profile')">Профиль</div>
+            <div class="nav-item" onclick="loadPage('stats')">Моя статистика</div>
+            <div class="nav-item" onclick="loadPage('inventory')">Инвентарь</div>
+            <div class="nav-item" onclick="loadPage('games')">История игр</div>
+            <div class="nav-item" onclick="loadPage('withdrawals')">История выводов</div>
+            <div class="nav-item" onclick="loadPage('transactions')">Транзакции</div>
+            <div class="nav-item" onclick="loadPage('bonuses')">Бонусы</div>
+            <div class="nav-item" onclick="loadPage('referral')">Реф. система</div>
+        </div>
+    </nav>
+
+    <!-- Контент -->
+    <div id="content" class="p-4">
+        <!-- Здесь будет загружаться контент -->
+    </div>
+
+    <script>
+        // Получаем user_id из URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const userId = urlParams.get('user_id');
+
+        if (!userId) {
+            alert("Не удалось авторизоваться");
+            window.location.href = '/login.html';
+        } else {
+            // Сохраняем в localStorage
+            localStorage.setItem('userId', userId);
+
+            // Загружаем баланс
+            fetch(`/api/balance/${userId}`)
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('balance').textContent = data.balance.toFixed(2);
+                });
+
+            // Убираем параметры из URL
+            window.history.replaceState({}, document.title, "/home.html");
+        }
+
+        function openProfile() {
+            window.location.href = '/profile.html';
+        }
+
+        function loadPage(page) {
+            const content = document.getElementById('content');
+            switch(page) {
+                case 'profile':
+                    content.innerHTML = '<h2>Профиль</h2><p>Здесь будет информация о профиле.</p>';
+                    break;
+                case 'stats':
+                    content.innerHTML = '<h2>Статистика</h2><p>Ваша игровая статистика.</p>';
+                    break;
+                default:
+                    content.innerHTML = `<h2>${page}</h2><p>Эта страница ещё не готова.</p>`;
+            }
+        }
+    </script>
+</body>
+</html>
