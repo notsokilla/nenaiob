@@ -9,7 +9,7 @@ import os
 app = FastAPI()
 
 # Подключение к SQLite
-conn = sqlite3.connect("casino.db", check_same_thread=False)
+conn = sqlite3.connect(":memory:", check_same_thread=False)
 cursor = conn.cursor()
 
 # Создание таблиц
