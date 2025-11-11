@@ -31,7 +31,7 @@ class User(Base):
 Base.metadata.create_all(bind=engine)
 
 # Telegram Bot Token (замените на свой)
-TELEGRAM_BOT_TOKEN = os.getenv("8501831434:AAE1Mbfjc97nZD0Y4IshYqdgXdlvUn7_J2o")
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 if TELEGRAM_BOT_TOKEN is None:
     raise ValueError("TELEGRAM_BOT_TOKEN не установлен")
 
