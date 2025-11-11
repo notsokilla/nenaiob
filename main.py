@@ -41,8 +41,8 @@ def check_telegram_login_auth(data):
 
     return hmac.compare_digest(calculated_hash, received_hash)
 
-# Авторизация через Telegram
-@app.post("/api/auth/telegram-login")
+# Авторизация через Telegram (теперь GET)
+@app.get("/api/auth/telegram-login")
 def auth_telegram_login(request: Request):
     form_data = dict(request.query_params)
     if not check_telegram_login_auth(form_data):
