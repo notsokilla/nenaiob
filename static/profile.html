@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Профиль - Казино-Ненайоб</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #0f0f13;
+            color: #fff;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .section {
+            background: #1a1a2e;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 16px 0;
+        }
+        .btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .btn-primary {
+            background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+        }
+        .btn-danger {
+            background: #ff4d4d;
+            color: white;
+        }
+        .badge {
+            background: #ff6b6b;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .balance-box {
+            background: linear-gradient(90deg, #ff6b6b, #ff9d00);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            display: inline-block;
+        }
+        .input-field {
+            width: 100%;
+            padding: 8px;
+            border-radius: 8px;
+            background: #2d2d3f;
+            color: white;
+            border: none;
+        }
+        .promo-box {
+            background: linear-gradient(90deg, #ff6b6b, #ff9d00);
+            padding: 16px;
+            border-radius: 12px;
+            margin: 16px 0;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+
+    <!-- Шапка -->
+    <header class="p-4 flex justify-between items-center border-b border-gray-700">
+        <div class="flex items-center gap-4">
+            <h1 class="text-xl font-bold">Казино-Ненайоб</h1>
+        </div>
+
+        <div class="flex items-center gap-4">
+            <div class="balance-box">
+                Баланс: <span id="balance">Загрузка...</span>
+            </div>
+            <div class="profile-icon" onclick="openProfile()">
+                👤
+            </div>
+        </div>
+    </header>
+
+    <!-- Навигация -->
+    <nav class="p-4 bg-gray-800">
+        <div class="flex space-x-4">
+            <div class="nav-item active">Профиль</div>
+            <div class="nav-item">Моя статистика</div>
+            <div class="nav-item">Инвентарь</div>
+            <div class="nav-item">История игр</div>
+            <div class="nav-item">История выводов</div>
+            <div class="nav-item">Транзакции</div>
+            <div class="nav-item">Бонусы</div>
+            <div class="nav-item">Реф. система</div>
+        </div>
+    </nav>
+
+    <!-- Профиль -->
+    <div class="p-4">
+        <div class="section">
+            <div class="flex items-center gap-4 mb-4">
+                <img src="https://via.placeholder.com/64" class="w-16 h-16 rounded-full" alt="Avatar">
+                <div>
+                    <h2 id="username">Загрузка...</h2>
+                    <p>ID: <span id="user-id">-</span></p>
+                </div>
+            </div>
+            <div class="flex gap-4">
+                <button class="btn btn-primary">Trade URL ссылка</button>
+                <button class="btn btn-danger">Ошибка</button>
+            </div>
+            <div class="mt-4">
+                <button class="btn btn-danger">Выйти со всех устройств</button>
+                <button class="btn btn-primary ml-4">Пополнить</button>
+            </div>
+        </div>
+
+        <!-- Бонусная система -->
+        <div class="section">
+            <h3>🔒 Бонусная система</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                <div class="promo-box">
+                    <h4>Промо-код</h4>
+                    <p>Специальный / Обычный</p>
+                    <div class="flex gap-2 mt-2">
+                        <input type="text" class="input-field" placeholder="Введите код">
+                        <button class="btn btn-primary">✓</button>
+                    </div>
+                </div>
+                <div class="section">
+                    <h4>Бонусы</h4>
+                    <p>Бонусы</p>
+                </div>
+                <div class="section">
+                    <h4>Реф.система</h4>
+                    <p>Приглашайте и зарабатывайте</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Email рассылка -->
+        <div class="section">
+            <h3>✉️ Подписаться на нашу рассылку рекламных предложений и новостей</h3>
+            <div class="flex gap-4 mt-4">
+                <input type="email" id="email-input" class="input-field" placeholder="example@gmail.com">
+                <button class="btn btn-primary" onclick="updateEmail()">Подтвердить</button>
+            </div>
+            <p class="text-xs mt-2">Нажимая на кнопку, вы даёте согласие на обработку персональных данных и соглашаетесь с политикой конфиденциальности</p>
+        </div>
+    </div>
+
+    <script>
+        const userId = localStorage.getItem('userId');
+
+        if (!userId) {
+            window.location.href = '/login.html';
+        }
+
+        // Загружаем данные профиля
+        fetch(`/api/profile/${userId}`)
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('username').textContent = data.username;
+                document.getElementById('user-id').textContent = data.id;
+                document.getElementById('balance').textContent = data.balance.toFixed(2);
+                document.getElementById('email-input').value = data.email || '';
+            });
+
+        function updateEmail() {
+            const email = document.getElementById('email-input').value;
+            fetch(`/api/update-email/${userId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email })
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert('Email обновлён!');
+            });
+        }
+
+        function openProfile() {
+            // Уже на профиле
+        }
+    </script>
+</body>
+</html>

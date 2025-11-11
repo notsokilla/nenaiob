@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+authlib
+requests
+authlib[httpx]
+httpx

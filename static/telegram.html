@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Казино-Ненайоб</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #0f0f13;
+            color: #fff;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .balance-box {
+            background: #1a1a2e;
+            padding: 6px 12px;
+            border-radius: 8px;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        .game-card {
+            background: linear-gradient(135deg, #0c0c1a, #1a1a2e);
+            border-radius: 12px;
+            padding: 16px;
+            transition: transform 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        .game-card:hover {
+            transform: translateY(-4px);
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+
+    <!-- Шапка -->
+    <header class="p-4 flex justify-between items-center border-b border-gray-700">
+        <div class="flex items-center gap-4">
+            <h1 class="text-xl font-bold">Казино-Ненайоб</h1>
+        </div>
+
+        <div class="flex items-center gap-4">
+            <div class="balance-box">
+                Баланс: <span id="balance">Загрузка...</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Игры -->
+    <div class="p-4">
+        <h2 class="text-xl font-bold mb-4">🎮 Игры</h2>
+        <div class="grid grid-cols-2 gap-4">
+            <div class="game-card" onclick="openGame('crash')">
+                <h3>Краш</h3>
+                <p>44.46$</p>
+            </div>
+            <div class="game-card" onclick="openGame('roulette')">
+                <h3>Рулетка</h3>
+                <p>0.00$</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Проверяем, запущено ли из Telegram Web App
+        if (window.Telegram && window.Telegram.WebApp) {
+            const initData = window.Telegram.WebApp.initData;
+            const initDataUnsafe = window.Telegram.WebApp.initDataUnsafe;
+
+            if (initDataUnsafe && initDataUnsafe.user) {
+                const user = initDataUnsafe.user;
+                document.getElementById('balance').textContent = 'Загрузка...';
+
+                // Отправляем данные на сервер для авторизации
+                fetch('/api/auth/telegram-webapp?' + new URLSearchParams(initDataUnsafe), {
+                    method: 'POST'
+                })
+                .then(res => res.json())
+                .then(data => {
+                    // Сохраняем данные пользователя
+                    localStorage.setItem('userId', data.user_id);
+                    localStorage.setItem('balance', data.balance);
+                    localStorage.setItem('username', data.username);
+
+                    // Обновляем баланс
+                    document.getElementById('balance').textContent = data.balance.toFixed(2);
+                })
+                .catch(err => {
+                    console.error('Ошибка авторизации:', err);
+                    alert('Ошибка входа');
+                });
+            }
+        } else {
+            alert("Откройте это приложение в Telegram");
+        }
+
+        function openGame(game) {
+            alert(`Открытие игры: ${game}`);
+            // Здесь можно открыть игру
+        }
+    </script>
+</body>
+</html>
