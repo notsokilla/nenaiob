@@ -1,27 +1,12 @@
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, RedirectResponse
-from authlib.integrations.starlette_client import OAuth
 import hashlib
 import hmac
 import sqlite3
 import os
 
 app = FastAPI()
-
-# OAuth для VK
-oauth = OAuth()
-oauth.register(
-    name='vk',
-    server_metadata_url='https://oauth.vk.com/.well-known/openid-configuration',
-    access_token_url='https://oauth.vk.com/access_token',
-    authorize_url='https://oauth.vk.com/authorize',
-    client_kwargs={
-        'scope': 'email'
-    },
-    client_id='YOUR_VK_APP_ID',
-    client_secret='YOUR_VK_APP_SECRET'
-)
 
 # Подключение к SQLite
 conn = sqlite3.connect("casino.db", check_same_thread=False)
@@ -32,7 +17,6 @@ cursor.execute("""
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         telegram_id TEXT UNIQUE,
-        vk_id TEXT UNIQUE,
         username TEXT,
         balance REAL DEFAULT 100.0,
         email TEXT DEFAULT '',
@@ -42,7 +26,7 @@ cursor.execute("""
 conn.commit()
 
 # Telegram Bot Token (замените на свой)
-TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "YOUR_BOT_TOKEN_HERE")
+TELEGRAM_BOT_TOKEN = "8501831434:AAE1Mbfjc97nZD0Y4IshYqdgXdlvUn7_J2o"
 
 def check_telegram_login_auth(data):
     received_hash = data.pop('hash', None)
@@ -57,9 +41,9 @@ def check_telegram_login_auth(data):
 
     return hmac.compare_digest(calculated_hash, received_hash)
 
-# Авторизация через Telegram Web App
-@app.post("/api/auth/telegram-webapp")
-def auth_telegram_webapp(request: Request):
+# Авторизация через Telegram
+@app.post("/api/auth/telegram-login")
+def auth_telegram_login(request: Request):
     form_data = dict(request.query_params)
     if not check_telegram_login_auth(form_data):
         raise HTTPException(status_code=400, detail="Invalid Telegram login auth")
@@ -77,38 +61,6 @@ def auth_telegram_webapp(request: Request):
         cursor.execute(
             "INSERT INTO users (telegram_id, username, email) VALUES (?, ?, ?)",
             (telegram_id, username, email)
-        )
-        conn.commit()
-        user_id = cursor.lastrowid
-        balance = 100.0
-
-    # Возвращаем JSON вместо редиректа (для Web App)
-    return {"user_id": user_id, "balance": balance, "username": username, "email": email}
-
-# Авторизация через VK
-@app.get("/login/vk")
-async def login_vk(request: Request):
-    redirect_uri = request.url_for('auth_vk')
-    return await oauth.vk.authorize_redirect(request, redirect_uri)
-
-@app.route('/auth/vk', methods=['GET'])
-async def auth_vk(request: Request):
-    token = await oauth.vk.authorize_access_token(request)
-    user_info = token.get('user_info')
-
-    vk_id = str(user_info['id'])
-    username = f"{user_info.get('first_name', '')} {user_info.get('last_name', '')}".strip()
-    email = user_info.get('email', '')
-
-    cursor.execute("SELECT id, balance FROM users WHERE vk_id = ?", (vk_id,))
-    user = cursor.fetchone()
-    if user:
-        user_id = user[0]
-        balance = user[1]
-    else:
-        cursor.execute(
-            "INSERT INTO users (vk_id, username, email) VALUES (?, ?, ?)",
-            (vk_id, username, email)
         )
         conn.commit()
         user_id = cursor.lastrowid
