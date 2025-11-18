@@ -10,6 +10,35 @@
             color: #fff;
             font-family: 'Segoe UI', sans-serif;
         }
+        .nav-item {
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .nav-item:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        .active {
+            background: #1a1a2e;
+        }
+        .balance-box {
+            background: #1a1a2e;
+            padding: 6px 12px;
+            border-radius: 8px;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        .profile-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #4a4a6a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
         .section {
             background: #1a1a2e;
             border-radius: 12px;
@@ -65,7 +94,7 @@
     <!-- Шапка -->
     <header class="p-4 flex justify-between items-center border-b border-gray-700">
         <div class="flex items-center gap-4">
-            <h1 class="text-xl font-bold">Казино-Ненайоб</h1>
+            <h1 class="text-xl font-bold cursor-pointer" onclick="window.location.href='/home.html'">Казино-Ненайоб</h1>
         </div>
 
         <div class="flex items-center gap-4">
@@ -82,13 +111,13 @@
     <nav class="p-4 bg-gray-800">
         <div class="flex space-x-4">
             <div class="nav-item active">Профиль</div>
-            <div class="nav-item">Моя статистика</div>
-            <div class="nav-item">Инвентарь</div>
-            <div class="nav-item">История игр</div>
-            <div class="nav-item">История выводов</div>
-            <div class="nav-item">Транзакции</div>
-            <div class="nav-item">Бонусы</div>
-            <div class="nav-item">Реф. система</div>
+            <div class="nav-item" onclick="loadPage('stats')">Моя статистика</div>
+            <div class="nav-item" onclick="loadPage('inventory')">Инвентарь</div>
+            <div class="nav-item" onclick="loadPage('games')">История игр</div>
+            <div class="nav-item" onclick="loadPage('withdrawals')">История выводов</div>
+            <div class="nav-item" onclick="loadPage('transactions')">Транзакции</div>
+            <div class="nav-item" onclick="loadPage('bonuses')">Бонусы</div>
+            <div class="nav-item" onclick="loadPage('referral')">Реф. система</div>
         </div>
     </nav>
 
@@ -147,25 +176,35 @@
     </div>
 
     <script>
-        const userId = localStorage.getItem('userId');
-
-        if (!userId) {
+        // Проверяем, есть ли в localStorage
+        if (!localStorage.getItem('userId')) {
+            alert("Не удалось авторизоваться");
             window.location.href = '/login.html';
+        } else {
+            // Загружаем баланс
+            fetch(`/api/balance/${localStorage.getItem('userId')}`)
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('balance').textContent = data.balance.toFixed(2);
+                });
+
+            // Загружаем профиль
+            fetch(`/api/profile/${localStorage.getItem('userId')}`)
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('username').textContent = data.username;
+                    document.getElementById('user-id').textContent = data.id;
+                    document.getElementById('email-input').value = data.email || '';
+                });
         }
 
-        // Загружаем данные профиля
-        fetch(`/api/profile/${userId}`)
-            .then(res => res.json())
-            .then(data => {
-                document.getElementById('username').textContent = data.username;
-                document.getElementById('user-id').textContent = data.id;
-                document.getElementById('balance').textContent = data.balance.toFixed(2);
-                document.getElementById('email-input').value = data.email || '';
-            });
+        function openProfile() {
+            // Уже на профиле
+        }
 
         function updateEmail() {
             const email = document.getElementById('email-input').value;
-            fetch(`/api/update-email/${userId}`, {
+            fetch(`/api/update-email/${localStorage.getItem('userId')}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email })
@@ -176,8 +215,8 @@
             });
         }
 
-        function openProfile() {
-            // Уже на профиле
+        function loadPage(page) {
+            window.location.href = `/${page}.html`;
         }
     </script>
 </body>
