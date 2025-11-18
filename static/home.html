@@ -118,7 +118,6 @@
 
     <!-- Контент -->
     <div id="content" class="p-4">
-        <!-- Здесь будет загружаться контент -->
         <h2 class="text-2xl font-bold mb-4">Режимы игр</h2>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -182,26 +181,17 @@
     </div>
 
     <script>
-        // Получаем user_id из URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const userId = urlParams.get('user_id');
-
-        if (!userId) {
+        // Проверяем, есть ли в localStorage
+        if (!localStorage.getItem('userId')) {
             alert("Не удалось авторизоваться");
             window.location.href = '/login.html';
         } else {
-            // Сохраняем в localStorage
-            localStorage.setItem('userId', userId);
-
             // Загружаем баланс
-            fetch(`/api/balance/${userId}`)
+            fetch(`/api/balance/${localStorage.getItem('userId')}`)
                 .then(res => res.json())
                 .then(data => {
                     document.getElementById('balance').textContent = data.balance.toFixed(2);
                 });
-
-            // Убираем параметры из URL
-            window.history.replaceState({}, document.title, "/home.html");
         }
 
         function openProfile() {

@@ -92,7 +92,7 @@ def game_page(game_name: str):
             </head>
             <body class="p-8">
                 <h1 class="text-3xl font-bold">Вы выбрали игру: {game_name}</h1>
-                <p class="mt-4">Это место для вашей игры. Реализуйте её логику здесь.</p>
+                <p class="mt-4">Это место для  игры с писюном.</p>
                 <button onclick="window.location.href='/home.html'" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded">Назад к играм</button>
             </body>
         </html>
