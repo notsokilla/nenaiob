@@ -176,20 +176,22 @@
     </div>
 
     <script>
-        // Проверяем, есть ли в localStorage
-        if (!localStorage.getItem('userId')) {
+        // Получаем user_id из localStorage
+        const userId = localStorage.getItem('userId');
+
+        if (!userId) {
             alert("Не удалось авторизоваться");
             window.location.href = '/login.html';
         } else {
             // Загружаем баланс
-            fetch(`/api/balance/${localStorage.getItem('userId')}`)
+            fetch(`/api/balance/${userId}`)
                 .then(res => res.json())
                 .then(data => {
                     document.getElementById('balance').textContent = data.balance.toFixed(2);
                 });
 
             // Загружаем профиль
-            fetch(`/api/profile/${localStorage.getItem('userId')}`)
+            fetch(`/api/profile/${userId}`)
                 .then(res => res.json())
                 .then(data => {
                     document.getElementById('username').textContent = data.username;
@@ -204,7 +206,7 @@
 
         function updateEmail() {
             const email = document.getElementById('email-input').value;
-            fetch(`/api/update-email/${localStorage.getItem('userId')}`, {
+            fetch(`/api/update-email/${userId}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email })
