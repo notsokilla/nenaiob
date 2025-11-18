@@ -6,13 +6,15 @@ import hmac
 import sqlite3
 import os
 from sqlalchemy import create_engine, Column, Integer, String, Float
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
 
 app = FastAPI()
 
 # Подключение к PostgreSQL
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://user:password@host:5432/dbname")
+DATABASE_URL = os.getenv("DATABASE_URL")
+if DATABASE_URL is None:
+    raise ValueError("DATABASE_URL не установлен")
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -74,7 +76,7 @@ def auth_telegram_login(request: Request):
 
     db.close()
 
-    redirect_url = f"/home.html?user_id={user_id}"
+    redirect_url = f"/games.html?user_id={user_id}"
     return RedirectResponse(url=redirect_url, status_code=302)
 
 # Эндпоинт для игр
