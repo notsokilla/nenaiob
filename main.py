@@ -3,12 +3,11 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, RedirectResponse
 import hashlib
 import hmac
+import sqlite3
 import os
-from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime
+from sqlalchemy import create_engine, Column, Integer, String, Float
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
-from datetime import datetime
-import stripe
 
 app = FastAPI()
 
@@ -31,17 +30,6 @@ class User(Base):
     balance = Column(Float, default=100.0)
     email = Column(String, default="")
 
-# Модель пополнений
-class Deposit(Base):
-    __tablename__ = "deposits"
-
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, index=True)
-    amount = Column(Float)
-    method = Column(String)
-    status = Column(String, default="pending")
-    created_at = Column(DateTime, default=datetime.utcnow)
-
 # Создание таблиц
 Base.metadata.create_all(bind=engine)
 
@@ -49,13 +37,6 @@ Base.metadata.create_all(bind=engine)
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 if TELEGRAM_BOT_TOKEN is None:
     raise ValueError("TELEGRAM_BOT_TOKEN не установлен")
-
-# Stripe Secret Key (замените на свой)
-STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")
-if STRIPE_SECRET_KEY is None:
-    raise ValueError("STRIPE_SECRET_KEY не установлен")
-
-stripe.api_key = STRIPE_SECRET_KEY
 
 def check_telegram_login_auth(data):
     received_hash = data.pop('hash', None)
@@ -95,70 +76,50 @@ def auth_telegram_login(request: Request):
 
     db.close()
 
-    redirect_url = f"/deposit.html?user_id={user_id}"
+    redirect_url = f"/home.html?user_id={user_id}"
     return RedirectResponse(url=redirect_url, status_code=302)
 
-# Эндпоинт для пополнения баланса
-@app.post("/api/deposit/{user_id}")
-def deposit_balance(user_id: int, amount: float, method: str):
+# Эндпоинт для игр
+@app.get("/game/{game_name}")
+def game_page(game_name: str):
+    # Здесь можно добавить логику для конкретной игры
+    return HTMLResponse(content=f"""
+        <html>
+            <head>
+                <title>Игра {game_name}</title>
+                <script src="https://cdn.tailwindcss.com"></script>
+                <style>body {{ background: #0f0f13; color: white; font-family: 'Segoe UI', sans-serif; }}</style>
+            </head>
+            <body class="p-8">
+                <h1 class="text-3xl font-bold">Вы выбрали игру: {game_name}</h1>
+                <p class="mt-4">Это место для вашей игры. Реализуйте её логику здесь.</p>
+                <button onclick="window.location.href='/home.html'" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded">Назад к играм</button>
+            </body>
+        </html>
+    """)
+
+@app.get("/api/balance/{user_id}")
+def get_balance(user_id: int):
     db = SessionLocal()
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
+    db.close()
+    return {"balance": user.balance}
 
-    # Создаём сессию Stripe Checkout
-    try:
-        session = stripe.checkout.Session.create(
-            payment_method_types=['card'],
-            line_items=[{
-                'price_data': {
-                    'currency': 'usd',
-                    'product_data': {
-                        'name': 'Пополнение баланса',
-                    },
-                    'unit_amount': int(amount * 100),  # в центах
-                },
-                'quantity': 1,
-            }],
-            mode='payment',
-            success_url=f'https://your-site.com/success?session_id={{CHECKOUT_SESSION_ID}}',
-            cancel_url='https://your-site.com/cancel',
-        )
-
-        # Сохраняем попытку пополнения
-        deposit = Deposit(user_id=user_id, amount=amount, method=method, status="pending")
-        db.add(deposit)
-        db.commit()
-
-        db.close()
-
-        return {"session_id": session.id, "url": session.url}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-# Эндпоинт для проверки статуса платежа
-@app.get("/api/payment-status")
-def payment_status(session_id: str):
-    try:
-        session = stripe.checkout.Session.retrieve(session_id)
-
-        if session.payment_status == "paid":
-            # Обновляем статус пополнения
-            db = SessionLocal()
-            deposit = db.query(Deposit).filter(Deposit.status == "pending", Deposit.id == session_id).first()
-            if deposit:
-                deposit.status = "completed"
-                user = db.query(User).filter(User.id == deposit.user_id).first()
-                if user:
-                    user.balance += deposit.amount
-                db.commit()
-            db.close()
-
-            return {"status": "paid", "balance": user.balance}
-        else:
-            return {"status": "not_paid"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+@app.get("/api/profile/{user_id}")
+def get_profile(user_id: int):
+    db = SessionLocal()
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    db.close()
+    return {
+        "id": user.id,
+        "username": user.username,
+        "balance": user.balance,
+        "email": user.email,
+    }
 
 # Подключаем статику
 app.mount("/static", StaticFiles(directory="static"), name="static")
