@@ -120,6 +120,17 @@ def get_profile(user_id: int):
         "email": user.email,
     }
 
+@app.post("/api/update-email/{user_id}")
+def update_email(user_id: int, email: str):
+    db = SessionLocal()
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    user.email = email
+    db.commit()
+    db.close()
+    return {"message": "Email updated"}
+
 # Подключаем статику
 app.mount("/static", StaticFiles(directory="static"), name="static")
 app.mount("/", StaticFiles(directory="static", html=True), name="static")
