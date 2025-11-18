@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Пополнение баланса - Казино-Ненайоб</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://js.stripe.com/v3/"></script>
     <style>
         body {
             background-color: #0f0f13;
@@ -119,13 +120,17 @@
     </div>
 
     <script>
-        // Получаем user_id из localStorage
-        const userId = localStorage.getItem('userId');
+        // Получаем user_id из URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const userId = urlParams.get('user_id');
 
         if (!userId) {
             alert("Не удалось авторизоваться");
             window.location.href = '/login.html';
         } else {
+            // Сохраняем в localStorage
+            localStorage.setItem('userId', userId);
+
             // Загружаем баланс
             fetch(`/api/balance/${userId}`)
                 .then(res => res.json())
@@ -159,12 +164,10 @@
             })
             .then(res => res.json())
             .then(data => {
-                alert('Баланс пополнен!');
-                // Обновляем баланс на странице
-                document.getElementById('balance').textContent = data.balance.toFixed(2);
+                // Перенаправляем на страницу оплаты Stripe
+                window.location.href = data.url;
             })
             .catch(err => {
-                console.error('Ошибка при пополнении:', err);
                 alert('Ошибка при пополнении');
             });
         }

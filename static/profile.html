@@ -218,7 +218,20 @@
         }
 
         function loadPage(page) {
-            window.location.href = `/${page}.html`;
+            const content = document.getElementById('content');
+            switch(page) {
+                case 'profile':
+                    window.location.href = '/profile.html';
+                    break;
+                case 'stats':
+                    content.innerHTML = '<h2>Статистика</h2><p>Ваша игровая статистика.</p>';
+                    break;
+                case 'games':
+                    content.innerHTML = '<h2>Игры</h2><p>Выберите игру для начала.</p>';
+                    break;
+                default:
+                    content.innerHTML = `<h2>${page}</h2><p>Эта страница ещё не готова.</p>`;
+            }
         }
 
         function openDeposit() {
