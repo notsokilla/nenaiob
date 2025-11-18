@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Пополнение баланса - Казино-Ненайоб</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #0f0f13;
+            color: #fff;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .nav-item {
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .nav-item:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        .active {
+            background: #1a1a2e;
+        }
+        .balance-box {
+            background: #1a1a2e;
+            padding: 6px 12px;
+            border-radius: 8px;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        .profile-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #4a4a6a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        .section {
+            background: #1a1a2e;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 16px 0;
+        }
+        .btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .btn-primary {
+            background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+        }
+        .btn-danger {
+            background: #ff4d4d;
+            color: white;
+        }
+        .input-field {
+            width: 100%;
+            padding: 8px;
+            border-radius: 8px;
+            background: #2d2d3f;
+            color: white;
+            border: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+
+    <!-- Шапка -->
+    <header class="p-4 flex justify-between items-center border-b border-gray-700">
+        <div class="flex items-center gap-4">
+            <h1 class="text-xl font-bold cursor-pointer" onclick="window.location.href='/home.html'">Казино-Ненайоб</h1>
+        </div>
+
+        <div class="flex items-center gap-4">
+            <div class="balance-box">
+                Баланс: <span id="balance">Загрузка...</span>
+            </div>
+            <div class="profile-icon" onclick="openProfile()">
+                👤
+            </div>
+        </div>
+    </header>
+
+    <!-- Навигация -->
+    <nav class="p-4 bg-gray-800">
+        <div class="flex space-x-4">
+            <div class="nav-item" onclick="loadPage('profile')">Профиль</div>
+            <div class="nav-item" onclick="loadPage('stats')">Моя статистика</div>
+            <div class="nav-item" onclick="loadPage('inventory')">Инвентарь</div>
+            <div class="nav-item" onclick="loadPage('games')">История игр</div>
+            <div class="nav-item" onclick="loadPage('withdrawals')">История выводов</div>
+            <div class="nav-item" onclick="loadPage('transactions')">Транзакции</div>
+            <div class="nav-item" onclick="loadPage('bonuses')">Бонусы</div>
+            <div class="nav-item" onclick="loadPage('referral')">Реф. система</div>
+        </div>
+    </nav>
+
+    <!-- Пополнение -->
+    <div class="p-4">
+        <div class="section">
+            <h2 class="text-2xl font-bold mb-4">Пополнить баланс</h2>
+            <div class="flex flex-col gap-4">
+                <label>Сумма:</label>
+                <input type="number" id="amount" class="input-field" placeholder="Введите сумму">
+                <label>Метод оплаты:</label>
+                <select id="payment-method" class="input-field">
+                    <option value="card">Карта</option>
+                    <option value="crypto">Криптовалюта</option>
+                    <option value="paypal">PayPal</option>
+                </select>
+                <button class="btn btn-primary" onclick="deposit()">Пополнить</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Получаем user_id из localStorage
+        const userId = localStorage.getItem('userId');
+
+        if (!userId) {
+            alert("Не удалось авторизоваться");
+            window.location.href = '/login.html';
+        } else {
+            // Загружаем баланс
+            fetch(`/api/balance/${userId}`)
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('balance').textContent = data.balance.toFixed(2);
+                });
+        }
+
+        function openProfile() {
+            window.location.href = '/profile.html';
+        }
+
+        function loadPage(page) {
+            window.location.href = `/${page}.html`;
+        }
+
+        function deposit() {
+            const amount = document.getElementById('amount').value;
+            const method = document.getElementById('payment-method').value;
+
+            if (!amount || amount <= 0) {
+                alert("Введите корректную сумму");
+                return;
+            }
+
+            // Здесь можно добавить логику пополнения баланса
+            fetch(`/api/deposit/${userId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ amount, method })
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert('Баланс пополнен!');
+                // Обновляем баланс на странице
+                document.getElementById('balance').textContent = data.balance.toFixed(2);
+            })
+            .catch(err => {
+                alert('Ошибка при пополнении');
+            });
+        }
+    </script>
+</body>
+</html>
