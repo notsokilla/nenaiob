@@ -151,11 +151,11 @@
                 return;
             }
 
-            // Здесь можно добавить логику пополнения баланса
+            // Отправляем запрос на пополнение
             fetch(`/api/deposit/${userId}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ amount, method })
+                body: JSON.stringify({ amount: parseFloat(amount), method })
             })
             .then(res => res.json())
             .then(data => {
@@ -164,6 +164,7 @@
                 document.getElementById('balance').textContent = data.balance.toFixed(2);
             })
             .catch(err => {
+                console.error('Ошибка при пополнении:', err);
                 alert('Ошибка при пополнении');
             });
         }
