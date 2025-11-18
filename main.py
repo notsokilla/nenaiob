@@ -3,6 +3,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, RedirectResponse
 import hashlib
 import hmac
+import sqlite3
 import os
 from sqlalchemy import create_engine, Column, Integer, String, Float
 from sqlalchemy.orm import sessionmaker
@@ -75,7 +76,7 @@ def auth_telegram_login(request: Request):
 
     db.close()
 
-    redirect_url = f"/games.html?user_id={user_id}"
+    redirect_url = f"/home.html?user_id={user_id}"
     return RedirectResponse(url=redirect_url, status_code=302)
 
 # Эндпоинт для игр
@@ -93,6 +94,143 @@ def game_page(game_name: str):
                 <h1 class="text-3xl font-bold">Вы выбрали игру: {game_name}</h1>
                 <p class="mt-4">Это место для вашей игры. Реализуйте её логику здесь.</p>
                 <button onclick="window.location.href='/games.html'" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded">Назад к играм</button>
+            </body>
+        </html>
+    """)
+
+# Эндпоинты для шапки
+@app.get("/profile.html")
+def profile_page():
+    return HTMLResponse(content="""
+        <html>
+            <head>
+                <title>Профиль - Казино-Ненайоб</title>
+                <script src="https://cdn.tailwindcss.com"></script>
+                <style>body {{ background: #0f0f13; color: white; font-family: 'Segoe UI', sans-serif; }}</style>
+            </head>
+            <body class="p-8">
+                <h1 class="text-3xl font-bold">Профиль</h1>
+                <p class="mt-4">Здесь будет информация о профиле.</p>
+                <button onclick="window.location.href='/home.html'" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded">На главную</button>
+            </body>
+        </html>
+    """)
+
+@app.get("/stats.html")
+def stats_page():
+    return HTMLResponse(content="""
+        <html>
+            <head>
+                <title>Моя статистика - Казино-Ненайоб</title>
+                <script src="https://cdn.tailwindcss.com"></script>
+                <style>body {{ background: #0f0f13; color: white; font-family: 'Segoe UI', sans-serif; }}</style>
+            </head>
+            <body class="p-8">
+                <h1 class="text-3xl font-bold">Моя статистика</h1>
+                <p class="mt-4">Ваша игровая статистика.</p>
+                <button onclick="window.location.href='/home.html'" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded">На главную</button>
+            </body>
+        </html>
+    """)
+
+@app.get("/inventory.html")
+def inventory_page():
+    return HTMLResponse(content="""
+        <html>
+            <head>
+                <title>Инвентарь - Казино-Ненайоб</title>
+                <script src="https://cdn.tailwindcss.com"></script>
+                <style>body {{ background: #0f0f13; color: white; font-family: 'Segoe UI', sans-serif; }}</style>
+            </head>
+            <body class="p-8">
+                <h1 class="text-3xl font-bold">Инвентарь</h1>
+                <p class="mt-4">Здесь будет информация об инвентаре.</p>
+                <button onclick="window.location.href='/home.html'" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded">На главную</button>
+            </body>
+        </html>
+    """)
+
+@app.get("/games.html")
+def games_page():
+    return HTMLResponse(content="""
+        <html>
+            <head>
+                <title>История игр - Казино-Ненайоб</title>
+                <script src="https://cdn.tailwindcss.com"></script>
+                <style>body {{ background: #0f0f13; color: white; font-family: 'Segoe UI', sans-serif; }}</style>
+            </head>
+            <body class="p-8">
+                <h1 class="text-3xl font-bold">История игр</h1>
+                <p class="mt-4">Выберите игру для начала.</p>
+                <button onclick="window.location.href='/home.html'" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded">На главную</button>
+            </body>
+        </html>
+    """)
+
+@app.get("/withdrawals.html")
+def withdrawals_page():
+    return HTMLResponse(content="""
+        <html>
+            <head>
+                <title>История выводов - Казино-Ненайоб</title>
+                <script src="https://cdn.tailwindcss.com"></script>
+                <style>body {{ background: #0f0f13; color: white; font-family: 'Segoe UI', sans-serif; }}</style>
+            </head>
+            <body class="p-8">
+                <h1 class="text-3xl font-bold">История выводов</h1>
+                <p class="mt-4">Здесь будет информация об истории выводов.</p>
+                <button onclick="window.location.href='/home.html'" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded">На главную</button>
+            </body>
+        </html>
+    """)
+
+@app.get("/transactions.html")
+def transactions_page():
+    return HTMLResponse(content="""
+        <html>
+            <head>
+                <title>Транзакции - Казино-Ненайоб</title>
+                <script src="https://cdn.tailwindcss.com"></script>
+                <style>body {{ background: #0f0f13; color: white; font-family: 'Segoe UI', sans-serif; }}</style>
+            </head>
+            <body class="p-8">
+                <h1 class="text-3xl font-bold">Транзакции</h1>
+                <p class="mt-4">Здесь будет информация о транзакциях.</p>
+                <button onclick="window.location.href='/home.html'" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded">На главную</button>
+            </body>
+        </html>
+    """)
+
+@app.get("/bonuses.html")
+def bonuses_page():
+    return HTMLResponse(content="""
+        <html>
+            <head>
+                <title>Бонусы - Казино-Ненайоб</title>
+                <script src="https://cdn.tailwindcss.com"></script>
+                <style>body {{ background: #0f0f13; color: white; font-family: 'Segoe UI', sans-serif; }}</style>
+            </head>
+            <body class="p-8">
+                <h1 class="text-3xl font-bold">Бонусы</h1>
+                <p class="mt-4">Здесь будет информация о бонусах.</p>
+                <button onclick="window.location.href='/home.html'" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded">На главную</button>
+            </body>
+        </html>
+    """)
+
+@app.get("/referral.html")
+def referral_page():
+    return HTMLResponse(content="""
+        <html>
+            <head>
+                <title>Реф. система - Казино-Ненайоб</title>
+                <script src="https://cdn.tailwindcss.com"></script>
+                <style>body {{ background: #0f0f13; color: white; font-family: 'Segoe UI', sans-serif; }}</style>
+            </head>
+            <body class="p-8">
+                <h1 class="text-3xl font-bold">Реф. система</h1>
+                <p class="mt-4">Приглашайте и зарабатывайте.</p>
+                <button onclick="window.location.href='/home.html'" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded">На главную</button>
             </body>
         </html>
     """)
@@ -119,17 +257,6 @@ def get_profile(user_id: int):
         "balance": user.balance,
         "email": user.email,
     }
-
-@app.post("/api/update-email/{user_id}")
-def update_email(user_id: int, email: str):
-    db = SessionLocal()
-    user = db.query(User).filter(User.id == user_id).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    user.email = email
-    db.commit()
-    db.close()
-    return {"message": "Email updated"}
 
 # Подключаем статику
 app.mount("/static", StaticFiles(directory="static"), name="static")
