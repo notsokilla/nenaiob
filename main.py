@@ -3,6 +3,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, RedirectResponse
 import hashlib
 import hmac
+import sqlite3
 import os
 from sqlalchemy import create_engine, Column, Integer, String, Float
 from sqlalchemy.ext.declarative import declarative_base
@@ -11,7 +12,7 @@ from sqlalchemy.orm import sessionmaker
 app = FastAPI()
 
 # Подключение к PostgreSQL
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://users_nenaiob_user:4oYI56V3u9npNiNGNFko5PjJvN3YVGRa@dpg-d49s7kruibrs73c2idt0-a.frankfurt-postgres.render.com/users_nenaiob")
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://user:password@host:5432/dbname")
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -75,6 +76,25 @@ def auth_telegram_login(request: Request):
 
     redirect_url = f"/home.html?user_id={user_id}"
     return RedirectResponse(url=redirect_url, status_code=302)
+
+# Эндпоинт для игр
+@app.get("/game/{game_name}")
+def game_page(game_name: str):
+    # Здесь можно добавить логику для конкретной игры
+    return HTMLResponse(content=f"""
+        <html>
+            <head>
+                <title>Игра {game_name}</title>
+                <script src="https://cdn.tailwindcss.com"></script>
+                <style>body {{ background: #0f0f13; color: white; font-family: 'Segoe UI', sans-serif; }}</style>
+            </head>
+            <body class="p-8">
+                <h1 class="text-3xl font-bold">Вы выбрали игру: {game_name}</h1>
+                <p class="mt-4">Это место для вашей игры. Реализуйте её логику здесь.</p>
+                <button onclick="window.location.href='/games.html'" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded">Назад к играм</button>
+            </body>
+        </html>
+    """)
 
 @app.get("/api/balance/{user_id}")
 def get_balance(user_id: int):

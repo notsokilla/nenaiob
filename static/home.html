@@ -46,7 +46,7 @@
     <!-- Шапка -->
     <header class="p-4 flex justify-between items-center border-b border-gray-700">
         <div class="flex items-center gap-4">
-            <h1 class="text-xl font-bold">Казино-Ненайоб</h1>
+            <h1 class="text-xl font-bold cursor-pointer" onclick="window.location.href='/home.html'">Казино-Ненайоб</h1>
         </div>
 
         <div class="flex items-center gap-4">
@@ -76,6 +76,8 @@
     <!-- Контент -->
     <div id="content" class="p-4">
         <!-- Здесь будет загружаться контент -->
+        <h2 class="text-2xl font-bold mb-4">Добро пожаловать!</h2>
+        <p>Выберите игру или перейдите в профиль.</p>
     </div>
 
     <script>
@@ -113,6 +115,9 @@
                     break;
                 case 'stats':
                     content.innerHTML = '<h2>Статистика</h2><p>Ваша игровая статистика.</p>';
+                    break;
+                case 'games':
+                    window.location.href = '/games.html';
                     break;
                 default:
                     content.innerHTML = `<h2>${page}</h2><p>Эта страница ещё не готова.</p>`;

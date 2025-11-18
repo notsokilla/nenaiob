@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Режимы игр - Казино-Ненайоб</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #0f0f13;
+            color: #fff;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .game-card {
+            background: #1a1a2e;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.2s;
+            cursor: pointer;
+        }
+        .game-card:hover {
+            transform: scale(1.02);
+        }
+        .game-stats {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.5);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+        .game-title {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .game-price {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            font-size: 14px;
+            color: #4ade80;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+
+    <!-- Шапка -->
+    <header class="p-4 flex justify-between items-center border-b border-gray-700">
+        <div class="flex items-center gap-4">
+            <h1 class="text-xl font-bold cursor-pointer" onclick="window.location.href='/home.html'">Казино-Ненайоб</h1>
+        </div>
+
+        <div class="flex items-center gap-4">
+            <div class="balance-box">
+                Баланс: <span id="balance">Загрузка...</span>
+            </div>
+            <div class="profile-icon" onclick="openProfile()">
+                👤
+            </div>
+        </div>
+    </header>
+
+    <!-- Навигация -->
+    <nav class="p-4 bg-gray-800">
+        <div class="flex space-x-4">
+            <div class="nav-item active" onclick="loadPage('profile')">Профиль</div>
+            <div class="nav-item" onclick="loadPage('stats')">Моя статистика</div>
+            <div class="nav-item" onclick="loadPage('inventory')">Инвентарь</div>
+            <div class="nav-item" onclick="loadPage('games')">История игр</div>
+            <div class="nav-item" onclick="loadPage('withdrawals')">История выводов</div>
+            <div class="nav-item" onclick="loadPage('transactions')">Транзакции</div>
+            <div class="nav-item" onclick="loadPage('bonuses')">Бонусы</div>
+            <div class="nav-item" onclick="loadPage('referral')">Реф. система</div>
+        </div>
+    </nav>
+
+    <!-- Контент -->
+    <div id="content" class="p-4">
+        <h2 class="text-2xl font-bold mb-4">Режимы игр</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Игра 1 -->
+            <div class="game-card" onclick="window.location.href='/game/бегущий_человек'">
+                <img src="https://via.placeholder.com/300x200/0088cc/fff?text=Бегущий+человек" alt="Бегущий человек" class="w-full h-40 object-cover">
+                <div class="game-stats">70</div>
+                <div class="game-title">Бегущий человек</div>
+                <div class="game-price">44.46$</div>
+            </div>
+
+            <!-- Игра 2 -->
+            <div class="game-card" onclick="window.location.href='/game/плитки'">
+                <img src="https://via.placeholder.com/300x200/4a75f5/fff?text=Плитки" alt="Плитки" class="w-full h-40 object-cover">
+                <div class="game-stats">120</div>
+                <div class="game-title">Плитки</div>
+                <div class="game-price">53.97$</div>
+            </div>
+
+            <!-- Игра 3 -->
+            <div class="game-card" onclick="window.location.href='/game/jackrun'">
+                <img src="https://via.placeholder.com/300x200/0088cc/fff?text=Jackrun" alt="Jackrun" class="w-full h-40 object-cover">
+                <div class="game-stats">22</div>
+                <div class="game-title">Jackrun</div>
+                <div class="game-price">0.14$</div>
+            </div>
+
+            <!-- Игра 4 -->
+            <div class="game-card" onclick="window.location.href='/game/last_of_us'">
+                <img src="https://via.placeholder.com/300x200/4a75f5/fff?text=Last+of+us" alt="Last of us" class="w-full h-40 object-cover">
+                <div class="game-stats">142</div>
+                <div class="game-title">Last of us</div>
+                <div class="game-price">0.00$</div>
+            </div>
+
+            <!-- Игра 5 -->
+            <div class="game-card" onclick="window.location.href='/game/upgrade'">
+                <img src="https://via.placeholder.com/300x200/0088cc/fff?text=Upgrade" alt="Upgrade" class="w-full h-40 object-cover">
+                <div class="game-stats">9</div>
+                <div class="game-title">Upgrade</div>
+                <div class="game-price">—</div>
+            </div>
+
+            <!-- Игра 6 -->
+            <div class="game-card" onclick="window.location.href='/game/хранилище'">
+                <img src="https://via.placeholder.com/300x200/4a75f5/fff?text=Хранилище" alt="Хранилище" class="w-full h-40 object-cover">
+                <div class="game-stats">39</div>
+                <div class="game-title">Хранилище</div>
+                <div class="game-price">—</div>
+            </div>
+
+            <!-- Игра 7 -->
+            <div class="game-card" onclick="window.location.href='/game/кейсбатл'">
+                <img src="https://via.placeholder.com/300x200/0088cc/fff?text=Кейсбатл" alt="Кейсбатл" class="w-full h-40 object-cover">
+                <div class="game-stats">0</div>
+                <div class="game-title">Кейсбатл</div>
+                <div class="game-price">—</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Получаем user_id из URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const userId = urlParams.get('user_id');
+
+        if (!userId) {
+            alert("Не удалось авторизоваться");
+            window.location.href = '/login.html';
+        } else {
+            // Сохраняем в localStorage
+            localStorage.setItem('userId', userId);
+
+            // Загружаем баланс
+            fetch(`/api/balance/${userId}`)
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('balance').textContent = data.balance.toFixed(2);
+                });
+
+            // Убираем параметры из URL
+            window.history.replaceState({}, document.title, "/games.html");
+        }
+
+        function openProfile() {
+            window.location.href = '/profile.html';
+        }
+
+        function loadPage(page) {
+            const content = document.getElementById('content');
+            switch(page) {
+                case 'profile':
+                    content.innerHTML = '<h2>Профиль</h2><p>Здесь будет информация о профиле.</p>';
+                    break;
+                case 'stats':
+                    content.innerHTML = '<h2>Статистика</h2><p>Ваша игровая статистика.</p>';
+                    break;
+                case 'games':
+                    content.innerHTML = '<h2>Игры</h2><p>Выберите игру для начала.</p>';
+                    break;
+                default:
+                    content.innerHTML = `<h2>${page}</h2><p>Эта страница ещё не готова.</p>`;
+            }
+        }
+    </script>
+</body>
+</html>
